@@ -10,6 +10,8 @@ public class UserDataModel {
 
     private int capacity = DEFAULT_INIT_SIZE;
 
+    private DataProcessor processor = new DataProcessor();
+
     public String user_id;
     public HashMap<Date, Integer> heart_rates;
 
@@ -30,7 +32,7 @@ public class UserDataModel {
     public void add(int heart_rate) {
         this.heart_rates.put(new Date(), heart_rate);
         if(heart_rates.size() == capacity) {
-            new DataProcessor().execute(new UserDataModel(this));
+            processor.execute(new UserDataModel(this));
             this.heart_rates.clear();
         }
     }

@@ -111,6 +111,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:support-core-ui-28.0.0-alpha3" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:animated-vector-drawable-28.0.0-alpha3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.squareup:javawriter:2.1.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp-ws:3.4.2@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:cursoradapter-28.0.0-alpha3" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout-1.1.2" level="project" />
     <orderEntry type="library" name="Gradle: commons-logging:commons-logging:1.2@jar" level="project" />
@@ -126,7 +127,9 @@
     <orderEntry type="library" name="Gradle: com.android.support:coordinatorlayout-28.0.0-alpha3" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-28.0.0-alpha3" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:loader-28.0.0-alpha3" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.4.2@jar" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpcore-nio:4.4.6@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.9.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:runtime-1.1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: net.sf.kxml:kxml2:2.3.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:viewpager-28.0.0-alpha3" level="project" />

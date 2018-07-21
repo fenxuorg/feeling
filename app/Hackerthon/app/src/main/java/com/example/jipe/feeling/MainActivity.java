@@ -24,7 +24,6 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -50,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     // received data
     String receiveData="";
+
+    UserDataModel userData = new UserDataModel("123");
 
     MyHandler handler;
 
@@ -326,8 +327,11 @@ public class MainActivity extends AppCompatActivity {
                 newbuff[j]=buff[j];
             }
 
-            receiveData = new String(newbuff) + receiveData;
+            String received = new String(newbuff);
+            receiveData = received + receiveData;
             Log.e("Data", receiveData);
+
+            userData.add(Integer.parseInt(received));
             if(receiveData.length()>10000){
                 receiveData = receiveData.substring(0, 100);
             }

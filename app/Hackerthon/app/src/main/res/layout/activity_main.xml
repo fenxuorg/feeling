@@ -19,14 +19,14 @@
             android:id="@+id/button_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="搜索" />
+            android:text="Search" />
 
 
         <TextView
             android:id="@+id/text_search_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="搜索未开始" />
+            android:text= "Not started" />
     </LinearLayout>
 
     <LinearLayout
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:text="FC:58:FA:D6:8F:13">
+            android:text="98:D3:71:F5:C5:93">
 
             <requestFocus />
         </EditText>
@@ -60,7 +60,7 @@
             android:id="@+id/button1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="连接" />
+            android:text="Connect" />
     </LinearLayout>
 
     <LinearLayout
@@ -71,7 +71,7 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="当前没有连接任何设备" />
+            android:text="not connected" />
     </LinearLayout>
 
 
@@ -94,7 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="发送" />
+            android:text="Send" />
 
     </LinearLayout>
 
@@ -106,7 +106,7 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="接收到的数据" />
+            android:text="Received data" />
 
     </LinearLayout>
 
@@ -114,14 +114,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <EditText
-            android:id="@+id/editText2"
+        <TextView
+            android:id="@+id/receivedDataText"
             android:layout_width="wrap_content"
-            android:layout_height="300dp"
-            android:layout_weight="1"
-            android:ems="10"
-            android:inputType="textMultiLine" />
-
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:maxLines="15"
+            android:scrollbars="vertical"
+            android:singleLine="false" />
     </LinearLayout>
 
     <LinearLayout
@@ -132,7 +134,8 @@
             android:id="@+id/button3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="断开连接" />
+            android:text="Shut down"
+            android:marqueeRepeatLimit="marquee_forever"/>
 
     </LinearLayout>
 

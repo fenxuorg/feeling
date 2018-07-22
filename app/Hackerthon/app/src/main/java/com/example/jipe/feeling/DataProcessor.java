@@ -16,13 +16,21 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class DataProcessor extends AsyncTask<UserDataModel, String, String> {
-    private Gson gson = new Gson();
+    Gson gson;
 
-    private OkHttpClient client = new OkHttpClient();
+    OkHttpClient client;
+
+    public DataProcessor(){
+        gson = new Gson();
+
+        client = new OkHttpClient();
+    }
 
     @Override
     protected String doInBackground(UserDataModel... data) {
-        String json = gson.toJson(data[0]);
+        // String json = gson.toJson(data[0]);
+        String json = "{	\"user_id\": \"1234\",	\"heart_rate\":{		\"2018-07-10T08:35:58.3873392Z\": 123,		\"2018-07-10T08:35:58.3873391Z\": 123,		\"2018-07-10T08:35:58.3873393Z\": 123,    }}";
+
         // If no internet, save to file
         // or send it to server
         Request request = new Request.Builder()
@@ -30,6 +38,7 @@ public class DataProcessor extends AsyncTask<UserDataModel, String, String> {
                 .url("https://smartyi-webapp.azurewebsites.net/api/heartrate/receive")
                 .build();
 
+        Log.i("Request", "doInBackground: sending request" + request.toString());
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -42,7 +51,7 @@ public class DataProcessor extends AsyncTask<UserDataModel, String, String> {
                     throw new IOException("Server Error: " + response);
                 }
 
-                Log.e(" Server Request", "onResponse: " + response.body().string());
+                Log.i(" Server Request", "onResponse: " + response.body().string());
             }
         });
 

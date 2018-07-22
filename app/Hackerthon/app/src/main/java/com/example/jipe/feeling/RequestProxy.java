@@ -1,33 +1,17 @@
 package com.example.jipe.feeling;
 
-import android.arch.core.util.Function;
-import android.util.Log;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 public class RequestProxy {
-    private CloseableHttpAsyncClient httpclient;
+    OkHttpClient client;
 
     public RequestProxy(){
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setSocketTimeout(3000).setConnectTimeout(3000).build();
-        httpclient = HttpAsyncClients.custom()
-                .setDefaultRequestConfig(requestConfig).build();
-
-        try {
-            httpclient.start();
-        }
-        catch (Exception e){
-            Log.e("request", "RequestProxy: " + e.toString() );
-        }
+        client = new OkHttpClient();
     }
 
-    public void SendRequest(HttpUriRequest request, FutureCallback<HttpResponse> callback){
-        httpclient.execute(request, callback);
+    public void SendRequest(Request request, Callback callback){
+        client.newCall(request).enqueue(callback);
     }
 }

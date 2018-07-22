@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnConnect, btnSend, btnQuit, btnSearch;
     EditText etSend, etConnectAddress;
     // AutoMarqueeTextView etReceived;
-    TextView etReceived;
+    TextView etReceived, etlog;
 
     // device variables
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     // received data
     String receiveData="";
 
-    UserDataModel userData = new UserDataModel("123");
+    UserDataModel userData = new UserDataModel("jiayin");
 
     MyHandler handler;
 
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void InitComponents() {
-        connectStatusLabel=(TextView)this.findViewById(R.id.textView1);
+        connectStatusLabel=this.findViewById(R.id.textView1);
         searchStatusLebal = this.findViewById(R.id.text_search_status);
         textAddressList = this.findViewById(R.id.editText_address_list);
         btnConnect=(Button)this.findViewById(R.id.button1);
@@ -80,9 +80,11 @@ public class MainActivity extends AppCompatActivity {
         etSend=(EditText)this.findViewById(R.id.editText1);
         etReceived=this.findViewById(R.id.receivedDataText);
         etConnectAddress = this.findViewById(R.id.editText_address);
+        etlog = this.findViewById(R.id.log);
 
         // setting sscrolling method
         etReceived.setMovementMethod(ScrollingMovementMethod.getInstance());
+        etlog.setMovementMethod(ScrollingMovementMethod.getInstance());
     }
 
     public void InitBluetooth() {
@@ -115,8 +117,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 mBluetoothAdapter.startDiscovery();
 
+                String address = etConnectAddress.getText().toString();
+                connectStatusLabel.setText("Connecting to " + address +"...");
+
                 // connect
-                new ConnectTask().execute(etConnectAddress.getText().toString());
+                new ConnectTask().execute(address);
             }
         });
 
@@ -175,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             String action = intent.getAction();
 
             if(enableShowAddressList) {
-                Log.e("action", action);
+                Log.i("action", "onReceive: " + action);
                 if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
@@ -203,32 +208,32 @@ public class MainActivity extends AppCompatActivity {
     {
         @Override
         protected String doInBackground(String... params) {
-            // TODO Auto-generated method stub
-            BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(params[0]);
-
             try {
+                BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(params[0]);
+
                 UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-                btSocket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+                btSocket = device.createRfcommSocketToServiceRecord(SPP_UUID);
 
                 btSocket.connect();
 
-                Log.e("error", "ON RESUME: BT connection established, data transfer link open.");
+                Log.i("info", "ON RESUME: BT connection established, data transfer link open.");
             } catch (IOException e) {
                 try {
                     btSocket.close();
                     return "Socket create failed:" + e.toString();
                 } catch (IOException e2) {
-                    Log .e("error","ON RESUME: Unable to close socket during connection failure", e2);
+                    Log.e("Error", "doInBackground: ON RESUME: Unable to close socket during connection failure" + e2.toString());
                     return "Socket close failed";
                 }
             }
+
             // Cancle search
             mBluetoothAdapter.cancelDiscovery();
 
             try {
                 outStream = btSocket.getOutputStream();
             } catch (IOException e) {
-                Log.e("error", "ON RESUME: Output stream creation failed.", e);
+                Log.e("Error", "doInBackground: ON RESUME: Output stream creation failed." + e.toString());
                 return "Socket stream create failed: " + e.toString();
             }
 
@@ -238,12 +243,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         // This function is run in the main thread
         protected void onPostExecute(String result) {
+            connectStatusLabel.setText(result);
+
             // start moniter once connected
             rThread=new ReceiveThread();
 
             rThread.start();
-
-            connectStatusLabel.setText(result);
 
             super.onPostExecute(result);
         }
@@ -258,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
 
             connectStatusLabel.setText(result);
 
-            // Cleat the send edit text view
+            // Clear the send edit text view
             etSend.setText("");
         }
 
@@ -268,19 +273,22 @@ public class MainActivity extends AppCompatActivity {
             {
                 return "connection not created";
             }
+            int sendmsg = 0;
 
             if(arg0[0].length()>0)
             {
-                byte[] msgBuffer = arg0[0].getBytes();
+                // TODO: make a rule about msg
+                sendmsg = Integer.parseInt(arg0[0]);
 
                 try {
-                    outStream.write(msgBuffer);
+                    outStream.write(sendmsg);
                 } catch (IOException e) {
-                    Log.e("error", "ON RESUME: Exception during write.", e);
+                    Log.e("Error", "doInBackground: ON RESUME: Exception during write." + e.toString());
                     return "Send failed:" + e.toString();
                 }
             }
-            return "Send successfully";
+            Log.i("Info", "doInBackground: message(" + sendmsg + ") send!");
+            return "Send " + sendmsg + " successfully";
         }
 
     }
@@ -293,12 +301,12 @@ public class MainActivity extends AppCompatActivity {
 
             while(btSocket!=null )
             {
-                byte[] buff = new byte[1024];
+                byte[] buff = new byte[10];
                 try {
                     inStream = btSocket.getInputStream();
                     inStream.read(buff);
 
-                    processBuffer(buff,1024);
+                    processBuffer(buff,1);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -307,32 +315,11 @@ public class MainActivity extends AppCompatActivity {
 
         private void processBuffer(byte[] buff,int size)
         {
-            int length=0;
-            for(int i=0;i<size;i++)
-            {
-                if(buff[i]>'\0')
-                {
-                    length++;
-                }
-                else
-                {
-                    break;
-                }
-            }
+            int received = buff[0];
+            receiveData = received + "\n" + receiveData;
 
-            byte[] newbuff=new byte[length];
-
-            for(int j=0;j<length;j++)
-            {
-                newbuff[j]=buff[j];
-            }
-
-            String received = new String(newbuff);
-            receiveData = received + receiveData;
-            Log.e("Data", receiveData);
-
-            userData.add(Integer.parseInt(received));
-            if(receiveData.length()>10000){
+            userData.add(received);
+            if(receiveData.length()>1000){
                 receiveData = receiveData.substring(0, 100);
             }
             Message msg=Message.obtain();

@@ -21,8 +21,7 @@ namespace HeartRate.API
 
         public void Connect()
         {
-//            var connectionString = Configuration["TableConnectionString"];
-            var connectionString = "DefaultEndpointsProtocol=https;AccountName=feelingheartrate;AccountKey=qP5t7mwqHfe7cTTpV73WRPt6ZZVoAO75J1GVjb7k89LwOrxYKU42xWrZq6u7ukbc8HCdoQml3H5m0KcS8aPGfg==;TableEndpoint=https://feelingheartrate.table.cosmosdb.azure.com:443/;";
+            var connectionString = Configuration["TableConnectionString"];
             var storageAccount = CloudStorageAccount.Parse(connectionString);
             var tableClient = storageAccount.CreateCloudTableClient();
             _table = tableClient.GetTableReference("heartrate");

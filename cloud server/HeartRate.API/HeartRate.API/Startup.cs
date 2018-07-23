@@ -25,6 +25,7 @@ namespace HeartRate.API
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSingleton<BlobManager, BlobManager>();
+            services.AddSingleton<TableManager, TableManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,6 +41,8 @@ namespace HeartRate.API
             }
 
             var blobManager = app.ApplicationServices.GetService<BlobManager>();
+            var tableManager = app.ApplicationServices.GetService<TableManager>();
+            tableManager.Connect();
             app.UseHttpsRedirection();
             app.UseMvc();
         }

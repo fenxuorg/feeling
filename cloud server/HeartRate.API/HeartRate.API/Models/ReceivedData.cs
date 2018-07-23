@@ -4,12 +4,12 @@ using Newtonsoft.Json;
 
 namespace HeartRate.API.Models
 {
-    public class HeartRate
+    public class ReceivedData
     {
         [JsonProperty("user_id")]
         public string UserId { get; set; }
         
         [JsonProperty("heart_rate")]
-        public Dictionary<DateTime, int> Data { get; set; }
+        public Dictionary<string, int> Data { get; set; }
     }
 }

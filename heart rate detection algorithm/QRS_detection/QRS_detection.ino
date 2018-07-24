@@ -92,7 +92,7 @@ void loop() {
 
       bpm_buff[bpm_buff_WR_idx] = (60.0 / (((float) (foundTimeMicros - old_foundTimeMicros)) / 1000000.0));
 
-      bluetooth.println(bpm_buff[bpm_buff_WR_idx] + 20);
+      bluetooth.println(bpm_buff[bpm_buff_WR_idx]);
       Serial.println(bpm_buff[bpm_buff_WR_idx]);
 
       bpm_buff_WR_idx++;

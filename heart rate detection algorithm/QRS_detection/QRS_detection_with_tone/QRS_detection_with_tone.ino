@@ -124,15 +124,21 @@ void loop() {
           if (!IsSungSong && ContinuesHeartRateWarningCount >= HeartRateWarningCountBar)
           {
             Serial.println("A3-1023");
-            analogWrite(A3, 1023);
-            delay(12000);
+            analogWrite(A3, 600);
+            analogWrite(A4, 20);
+            analogWrite(A5, 20);
+            delay(8000);
             Serial.println("A4-1023");
-            analogWrite(A4, 1023);
-            delay(12000);
+            analogWrite(A3, 20);
+            analogWrite(A4, 600);
+            analogWrite(A5, 20);
+            delay(8000);
             Serial.println("A5-1023");
             sing(1);
-            analogWrite(A5, 1023);
-            delay(12000);
+            analogWrite(A3, 20);
+            analogWrite(A4, 20);
+            analogWrite(A5, 600);
+            delay(8000);
             // Police();
             Ambulance();
             ContinuesHeartRateWarningCount = 0;

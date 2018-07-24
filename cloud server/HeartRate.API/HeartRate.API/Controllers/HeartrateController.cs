@@ -9,20 +9,24 @@ namespace HeartRate.API.Controllers
     public class HeartrateController : Controller
     {
         private readonly BlobManager _blobManager;
-        private readonly TableManager _tableManager;
+        private readonly CosmosTableManager _cosmosTableManager;
+        private readonly StorageTableManager _storageTableManager;
 
-        public HeartrateController(BlobManager blobManager, TableManager tableManager)
+        public HeartrateController(BlobManager blobManager, CosmosTableManager cosmosTableManager, StorageTableManager storageTableManager)
         {
             _blobManager = blobManager;
-            _tableManager = tableManager;
+            _cosmosTableManager = cosmosTableManager;
+            _storageTableManager = storageTableManager;
         }
 
         [HttpGet]
         [Route("query")]
         public async Task<IActionResult> Get(string userId, string start, string end)
         {
-            var queryResult = await _tableManager.RetrieveRangeData(userId, start, end);
-            return Ok(queryResult);
+//            var queryResult = await _cosmosTableManager.RetrieveRangeData(userId, start, end);
+            var queryResult = await _storageTableManager.RetrieveRangeData(userId, start, end);
+            var result = _storageTableManager.DictToArray(queryResult);
+            return Ok(result);
         }
 
         [HttpPost]
@@ -30,7 +34,8 @@ namespace HeartRate.API.Controllers
         public async Task<IActionResult> Post([FromBody]ReceivedData receivedData)
         {
             await _blobManager.UploadData(receivedData);
-            await _tableManager.AddEntity(receivedData);
+//            await _cosmosTableManager.AddEntity(receivedData);
+            await _storageTableManager.AddEntity(receivedData);
             return Ok("Received");
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace HeartRate.API.Models
@@ -9,6 +8,7 @@ namespace HeartRate.API.Models
         [JsonProperty("user_id")]
         public string UserId { get; set; }
         
+        // {yyyyMMdd_HHmmss_fff, beats}
         [JsonProperty("heart_rate")]
         public Dictionary<string, int> Data { get; set; }
     }

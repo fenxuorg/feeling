@@ -21,6 +21,7 @@ namespace HeartRate.API
         public async Task UploadData(ReceivedData receivedData)
         {
             var storageCredentials = new StorageCredentials(Configuration["BlobContainerName"], Configuration["BlobContainerKey"]);
+//            var storageCredentials = new StorageCredentials(Configuration["BlobContainerName"], "RHcsrbyyrOdoVURvA0y6eIREag4832QOFQQIqcNsg6SWtMcpaSuaxrlpMIse69AO2ZQgrFPXSEYnciFB0hSHjQ==");
             var path = Configuration["BlobBeatsUri"] + receivedData.UserId + "/" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + ".json";
             var blobUri = new Uri(path);
             var blob = new CloudBlockBlob(blobUri, storageCredentials);

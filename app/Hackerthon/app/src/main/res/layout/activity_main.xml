@@ -51,8 +51,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:text="98:D3:71:F5:C5:93">
-
+            android:text="98:D3:21:F7:40:86">
+            <!--android:text="98:D3:71:F5:C5:93">-->
             <requestFocus />
         </EditText>
 

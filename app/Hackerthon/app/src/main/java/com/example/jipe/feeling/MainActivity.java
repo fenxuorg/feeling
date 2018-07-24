@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
             if(arg0[0].length()>0)
             {
                 // TODO: make a rule about msg
-                sendmsg = Integer.parseInt(arg0[0]);
+                sendmsg = convertStringToByte(arg0[0]);
 
                 try {
                     outStream.write(sendmsg);
@@ -291,6 +291,23 @@ public class MainActivity extends AppCompatActivity {
             return "Send " + sendmsg + " successfully";
         }
 
+        private byte convertStringToByte(String strValue) {
+            int intValue = 0;
+            try{
+                intValue = Integer.parseInt(strValue);
+                Log.e("Convert", "convertStringToByte: " + strValue + "->>" + intValue);
+            }
+            catch(NumberFormatException e){
+                Log.e("Error", "convertStringToByte: Error input");
+            }
+            if (intValue > 100 || intValue < -100) {
+                Log.e("Error", "convertStringToByte: Input number should not be greater than 100 or lower than -100");
+            }
+            if(intValue<0) {
+                intValue = 100 - intValue;
+            }
+            return (byte)intValue;
+        }
     }
 
     // Thread to receive date from blue tooth
@@ -315,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
 
         private void processBuffer(byte[] buff,int size)
         {
-            int received = buff[0];
+            int received = buff[0] & 0xff;
             receiveData = received + "\n" + receiveData;
 
             userData.add(received);

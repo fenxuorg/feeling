@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using HeartRate.API.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -17,19 +18,20 @@ namespace HeartRate.API
             Configuration = configuration;
         }
 
-        public async Task UploadData(Models.HeartRate heartRate)
+        public async Task UploadData(ReceivedData receivedData)
         {
             var storageCredentials = new StorageCredentials(Configuration["BlobContainerName"], Configuration["BlobContainerKey"]);
-            var path = Configuration["BlobBeatsUri"] + heartRate.UserId + "/" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + ".json";
+//            var storageCredentials = new StorageCredentials(Configuration["BlobContainerName"], "RHcsrbyyrOdoVURvA0y6eIREag4832QOFQQIqcNsg6SWtMcpaSuaxrlpMIse69AO2ZQgrFPXSEYnciFB0hSHjQ==");
+            var path = Configuration["BlobBeatsUri"] + receivedData.UserId + "/" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + ".json";
             var blobUri = new Uri(path);
             var blob = new CloudBlockBlob(blobUri, storageCredentials);
             
-            using (var uploadStream = ToJsonStream(heartRate))
+            using (var uploadStream = ToJsonStream(receivedData))
             {
                 await UploadAsync(uploadStream, blob);
             }
         }
-        
+
         public async Task UploadAsync(Stream source, CloudBlockBlob blob)
         {
             blob.Properties.ContentType = "application/octet-stream";
@@ -45,6 +47,17 @@ namespace HeartRate.API
             streamWriter.Flush();
             memoryStream.Position = 0;
             return memoryStream;
+        }
+        
+        private async Task<T> LoadData<T>(CloudBlockBlob blob)
+        {
+            var serializer = new JsonSerializer();
+            using (var stream = await blob.OpenReadAsync())
+            using (var sr = new StreamReader(stream))
+            using (var jsonTextReader = new JsonTextReader(sr))
+            {
+                return serializer.Deserialize<T>(jsonTextReader);
+            }
         }
     }
 }

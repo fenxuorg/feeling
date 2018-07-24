@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace HeartRate.API.Models
 {
-    public class HeartRate
+    public class ReceivedData
     {
         [JsonProperty("user_id")]
         public string UserId { get; set; }
         
+        // {yyyyMMdd_HHmmss_fff, beats}
         [JsonProperty("heart_rate")]
-        public Dictionary<DateTime, int> Data { get; set; }
+        public Dictionary<string, int> Data { get; set; }
     }
 }

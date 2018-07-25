@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     TextView connectStatusLabel, searchStatusLebal, textAddressList;
     Button btnConnect, btnSend, btnQuit, btnSearch;
     EditText etSend, etConnectAddress;
-    // AutoMarqueeTextView etReceived;
     TextView etReceived, etlog;
 
     // device variables
@@ -46,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
     // date received thread
     private ReceiveThread rThread=null;
+
+    private int baseRandom = 60;
 
     // received data
     String receiveData="";
@@ -70,19 +74,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void InitComponents() {
-        connectStatusLabel=this.findViewById(R.id.textView1);
+        connectStatusLabel = this.findViewById(R.id.textView1);
         searchStatusLebal = this.findViewById(R.id.text_search_status);
         textAddressList = this.findViewById(R.id.editText_address_list);
-        btnConnect=(Button)this.findViewById(R.id.button1);
-        btnSend=(Button)this.findViewById(R.id.button2);
-        btnQuit=this.findViewById(R.id.button3);
+        btnConnect = this.findViewById(R.id.button1);
+        btnSend = this.findViewById(R.id.button2);
+        btnQuit = this.findViewById(R.id.button3);
         btnSearch = this.findViewById(R.id.button_search);
-        etSend=(EditText)this.findViewById(R.id.editText1);
-        etReceived=this.findViewById(R.id.receivedDataText);
+        etSend = this.findViewById(R.id.editText1);
+        etReceived = this.findViewById(R.id.receivedDataText);
         etConnectAddress = this.findViewById(R.id.editText_address);
         etlog = this.findViewById(R.id.log);
 
-        // setting sscrolling method
+        // setting scrolling method
         etReceived.setMovementMethod(ScrollingMovementMethod.getInstance());
         etlog.setMovementMethod(ScrollingMovementMethod.getInstance());
     }
@@ -122,6 +126,13 @@ public class MainActivity extends AppCompatActivity {
 
                 // connect
                 new ConnectTask().execute(address);
+
+                /* fake data
+                connectStatusLabel.setText("BlueTooth connected, Socket created");
+                DataGenerateTask dThread = new DataGenerateTask();
+
+                dThread.start();
+                */
             }
         });
 
@@ -139,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
                             rThread.join();
                         }
                         connectStatusLabel.setText("当前连接已断开");
-                        // etReceived.setText("");
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
@@ -201,6 +211,30 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    class DataGenerateTask extends Thread
+    {
+        @Override
+        public void run() {
+            final Random rand = new Random();
+            new Timer().scheduleAtFixedRate(new TimerTask(){
+                @Override
+                public void run(){
+                    int data = rand.nextInt(20) + baseRandom;
+                    int received = data;
+                    receiveData = received + "\n" + receiveData;
+
+                    userData.add(received);
+                    if(receiveData.length()>1000){
+                        receiveData = receiveData.substring(0, 100);
+                    }
+                    Message msg=Message.obtain();
+                    msg.what=1;
+                    handler.sendMessage(msg);
+                }
+            },0,1000);
+        }
     }
 
     // connect to other bluetooth
@@ -279,13 +313,17 @@ public class MainActivity extends AppCompatActivity {
             {
                 // TODO: make a rule about msg
                 sendmsg = convertStringToByte(arg0[0]);
-
                 try {
                     outStream.write(sendmsg);
                 } catch (IOException e) {
                     Log.e("Error", "doInBackground: ON RESUME: Exception during write." + e.toString());
                     return "Send failed:" + e.toString();
                 }
+                /* fake data
+                int add = Integer.parseInt(arg0[0]);
+                sendmsg = add;
+                baseRandom += add;
+                */
             }
             Log.i("Info", "doInBackground: message(" + sendmsg + ") send!");
             return "Send " + sendmsg + " successfully";

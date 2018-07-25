@@ -19,11 +19,11 @@ import okhttp3.Response;
 public class UserDataModel {
     private static final int DEFAULT_INIT_SIZE = 10;
     private static final int WARNING_BAR = 100;
-    private static final String emailTemplate = "{\"Messages\":[{\"From\":{\"Email\":\"t-chali@microsoft.com\",\"Name\":\"MailTest\"},\"To\":[{\"Email\":\"jipe@microsoft.com\",\"Name\":\"Test\"}],\"TemplateID\":489523,\"TemplateLanguage\":true,\"Subject\":\"Warning!AbnormalHeartRatse\",\"Variables\":{\"img_src\":\"https://steemitimages.com/0x0/http://ipfs.io/ipfs/QmTQo4cxDZ5MoszQAK93JyhFedeMuj7j4x5P7tQnvRi4A5\"}}]}";
+    private static final String emailTemplate = "{\"Messages\":[{\"From\":{\"Email\":\"feelinghack@outlook.com\",\"Name\":\"FeelingTeam\"},\"To\":[{\"Email\":\"jipe@microsoft.com\",\"Name\":\"Test\"}],\"TemplateID\":492156,\"TemplateLanguage\":true,\"Subject\":\"Warning!AbnormalHeartRatse\",\"Variables\":{\"img_src\":\"https://steemitimages.com/0x0/http://ipfs.io/ipfs/QmTQo4cxDZ5MoszQAK93JyhFedeMuj7j4x5P7tQnvRi4A5\"}}]}";
 
     private int capacity = DEFAULT_INIT_SIZE;
     private RequestProxy storageServerProxy = new RequestProxy();
-    private RequestProxy emailServerProxy = new RequestProxy("a217be7e96e9431486d65320add5f36a", "8b5b4330dae39d3657bfab6cc817719a");
+    private RequestProxy emailServerProxy = new RequestProxy("eda3492958de0eefafe0a2d1365c5522", "95bda5a6a99a0a9ca3e6d1ffa30dde5c");
     private Gson gson = new Gson();
     private int warning_count = 0;
     private boolean sending = false;
@@ -49,7 +49,7 @@ public class UserDataModel {
 
             boolean needSendWarning = warningComputer(heart_rate);
             if(needSendWarning) {
-                // sendMsgToEmailService();
+                sendMsgToEmailService();
                 if (heart_rates.size() != capacity) {
                     sendMsgToStorageServer();
                 }

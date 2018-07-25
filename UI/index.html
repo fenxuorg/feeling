@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<TITLE>Hackerthon</TITLE>
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+	<script type="text/javascript">
+		$(function () {
+			$(document).ready(function () {
+				Highcharts.setOptions({
+					global: {
+						useUTC: false
+					}
+				});
+
+				var chart;
+
+				var startTime = new Date().getTime();
+				$.ajax({
+					url: generateRequestString("jiayin", startTime - 1000 * 60 * 60 * 5, startTime),
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					type: 'GET',
+					crossDomain: true,
+					success: function (result) {
+						$('#container').highcharts({
+							chart: {
+								animation: Highcharts.svg, // don't animate in old IE
+								zoomType: 'x',
+								events: {
+									load: function () {
+										// set up the updating of the chart each second             
+										var series = this.series[0];
+										setInterval(function () {
+											var now = new Date().getTime();
+											$.ajax({
+												url: generateRequestString("jiayin", now - 1000 * 10, now),
+												headers: {
+													'Content-Type': 'application/x-www-form-urlencoded'
+												},
+												type: 'GET',
+												crossDomain: true,
+												success: function (result) {
+													result.forEach(
+														function (item) {
+															series.addPoint([item[0], item[1]], true, false);
+														})
+												},
+												error: function (xhr, status, error) {
+													console.log("error");
+												}
+											})
+										}, 10000);
+									}
+								}
+							},
+							title: {
+								text: '动态走势图--10秒'
+							},
+							xAxis: {
+								type: 'datetime',
+							},
+							yAxis: {
+								title: {
+									text: '动态走势图--1秒'
+								}
+							},
+							tooltip: {
+								formatter: function () {
+									return '<b>' + this.series.name + '</b><br/>' +
+										Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+										Highcharts.numberFormat(this.y, 2);
+								}
+							},
+							plotOptions: {
+								area: {
+									fillColor: {
+										linearGradient: {
+											x1: 0,
+											y1: 0,
+											x2: 0,
+											y2: 1
+										},
+										stops: [
+											[0, Highcharts.getOptions().colors[0]],
+											[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+										]
+									},
+									marker: {
+										radius: 2
+									},
+									lineWidth: 1,
+									states: {
+										hover: {
+											lineWidth: 1
+										}
+									},
+									threshold: null
+								}
+							},
+
+							legend: {
+								enabled: false
+							},
+							exporting: {
+								enabled: false
+							},
+							series: [{
+								name: 'Random data',
+								data: result
+							}]
+						});
+					},
+					error: function (xhr, status, error) {
+						console.log("error");
+					}
+				});
+			});
+		});
+
+		function generateRequestString(userId, startTime, endTime) {
+			return "https://smartyi-webapp.azurewebsites.net/api/heartrate/query?userId=" + userId + "&start=" + startTime + "&end=" + endTime;
+			//    return "http://localhost:62824/api/heartrate/query?userId=" + userId + "&start=" + startTime + "&end=" + endTime;
+		}
+	</script>
+</HEAD>
+
+<BODY>
+	<div id="container" style="width:700px;height:400px;margin:0 auto;"></div>
+</BODY>
+
+</HTML>

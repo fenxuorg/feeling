@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace HeartRate.API.Models
+namespace WebApplication.Models
 {
     public class ReceivedData
     {

@@ -1,11 +1,12 @@
-﻿using System.IO;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HeartRate.API
+namespace WebApplication
 {
     public class Startup
     {
@@ -27,6 +28,9 @@ namespace HeartRate.API
             services.AddSingleton<BlobManager, BlobManager>();
             services.AddSingleton<CosmosTableManager, CosmosTableManager>();
             services.AddSingleton<StorageTableManager, StorageTableManager>();
+            
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,16 +42,30 @@ namespace HeartRate.API
             }
             else
             {
+                app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
 
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
+            app.UseMvc();
+            
             var blobManager = app.ApplicationServices.GetService<BlobManager>();
             var cosmosTableManager = app.ApplicationServices.GetService<CosmosTableManager>();
             cosmosTableManager.Connect();
             var storageTableManager = app.ApplicationServices.GetService<StorageTableManager>();
             storageTableManager.Connect();
-            app.UseHttpsRedirection();
-            app.UseMvc();
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+
+                if (env.IsDevelopment())
+                {
+                    spa.UseReactDevelopmentServer(npmScript: "start");
+                }
+            });
         }
     }
 }

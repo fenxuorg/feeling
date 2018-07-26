@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HeartRate.API.Models;
+using WebApplication.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace HeartRate.API
+namespace WebApplication
 {
     public class StorageTableManager
     {
@@ -30,9 +30,12 @@ namespace HeartRate.API
 
         public async Task AddEntity(ReceivedData receivedData)
         {
+            var tzi = TimeZoneInfo.FindSystemTimeZoneById("Alaskan Standard Time");
             foreach (var data in receivedData.Data)
             {
-                var pKey = DateTime.ParseExact(data.Key, "yyyyMMdd_HHmmss_fff", null).Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds*1000;
+                var time = TimeZoneInfo.ConvertTimeFromUtc(
+                    DateTime.ParseExact(data.Key, "yyyyMMdd_HHmmss_fff", null).ToUniversalTime(), tzi);
+                var pKey = time.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds*1000;
                 var beatsEntity = new BeatEntity(receivedData.UserId, pKey.ToString())
                 {
                     DateTime = DateTime.ParseExact(data.Key, "yyyyMMdd_HHmmss_fff", null),

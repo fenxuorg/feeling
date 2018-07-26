@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using HeartRate.API.Models;
+using WebApplication.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 
-namespace HeartRate.API
+namespace WebApplication
 {
     public class BlobManager
     {

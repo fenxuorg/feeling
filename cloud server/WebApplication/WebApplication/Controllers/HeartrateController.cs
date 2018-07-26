@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using HeartRate.API.Models;
+using System.Threading.Tasks;
+using WebApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HeartRate.API.Controllers
+namespace WebApplication.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

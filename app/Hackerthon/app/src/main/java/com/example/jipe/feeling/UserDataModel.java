@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -41,7 +42,7 @@ public class UserDataModel {
         this.user_id = userId;
         this.capacity = capacity;
         this.started_at = GetTime();
-        this.angles = new HashMap<String, Integer>();
+        this.angles = new ArrayList<Integer>();
     }
 
     public void add(int angle) {
@@ -66,7 +67,7 @@ public class UserDataModel {
 
     private String GetTime(){
         Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         return formatter.format(date);
     }
 
@@ -77,7 +78,7 @@ public class UserDataModel {
         storageServerProxy.SendRequest(
                 new Request.Builder()
                         .post(RequestBody.create(MediaType.parse("application/json"), json))
-                        .url("https://hackathon-student-posture.azurewebsites.net/api/v1/Posture")
+                        .url("https://hackathon-student-posture.azurewebsites.net/api/v1/Posture/SendDemoPostureInfoAsync")
                         .build(),
                 new Callback() {
                     @Override

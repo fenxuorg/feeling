@@ -356,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
 
             while(btSocket!=null )
             {
-                byte[] buff = new byte[10];
+                byte[] buff = new byte[40];
                 try {
                     inStream = btSocket.getInputStream();
                     inStream.read(buff);
@@ -370,10 +370,29 @@ public class MainActivity extends AppCompatActivity {
 
         private void processBuffer(byte[] buff,int size)
         {
-            int received = buff[0] & 0xff;
-            receiveData = received + "\n" + receiveData;
+            boolean isValid = false;
+            int received = 0;
+            for(int i = 0; i < buff.length; ++i)
+            {
+                received = buff[0] & 0xff;
+                if (received == 13 || received == 10)
+                {
+                    continue;
+                }
+                isValid = true;
+                if (received > 48)
+                {
+                    received = received - 48;
+                }
+                userData.add(received);
+            }
 
-            userData.add(received);
+            if (!isValid)
+            {
+                return;
+            }
+
+            receiveData = received + "\n" + receiveData;
             if(receiveData.length()>1000){
                 receiveData = receiveData.substring(0, 100);
             }

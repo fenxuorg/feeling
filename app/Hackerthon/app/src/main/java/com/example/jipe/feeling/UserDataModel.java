@@ -18,7 +18,7 @@ import okhttp3.Response;
 
 public class UserDataModel {
     private static final int DEFAULT_INIT_SIZE = 10;
-    private static final int WARNING_BAR = 100;
+    private static final int WARNING_BAR = 30;
     private static final String emailTemplate = "{\"Messages\":[{\"From\":{\"Email\":\"feelinghack@outlook.com\",\"Name\":\"FeelingTeam\"},\"To\":[{\"Email\":\"jipe@microsoft.com\",\"Name\":\"Test\"}],\"TemplateID\":492156,\"TemplateLanguage\":true,\"Subject\":\"Warning!AbnormalHeartRatse\",\"Variables\":{\"img_src\":\"https://steemitimages.com/0x0/http://ipfs.io/ipfs/QmTQo4cxDZ5MoszQAK93JyhFedeMuj7j4x5P7tQnvRi4A5\"}}]}";
 
     private int capacity = DEFAULT_INIT_SIZE;
@@ -29,7 +29,9 @@ public class UserDataModel {
     private boolean sending = false;
 
     public String user_id;
-    public HashMap<String, Integer> heart_rates;
+    public String started_at;
+    public String ended_at;
+    public ArrayList<Integer> angles;
 
     public UserDataModel(String userId){
         this(userId, DEFAULT_INIT_SIZE);
@@ -38,24 +40,16 @@ public class UserDataModel {
     public UserDataModel(String userId, int capacity) {
         this.user_id = userId;
         this.capacity = capacity;
-        this.heart_rates = new HashMap<String, Integer>();
+        this.started_at = GetTime();
+        this.angles = new HashMap<String, Integer>();
     }
 
-    public void add(int heart_rate) {
+    public void add(int angle) {
         try {
-            String date = GetTime();
-            this.heart_rates.put(date, heart_rate);
-            Log.i("Info:", "add: user data: <" + date + ", " + heart_rate + ">, heart_rate.length:" + heart_rates.size());
+            this.angles.add(angle);
+            Log.i("Info:", "add: user data: <" + angle + ">, angle.length:" + angles.size());
 
-            boolean needSendWarning = warningComputer(heart_rate);
-            if(needSendWarning) {
-                sendMsgToEmailService();
-                if (heart_rates.size() != capacity) {
-                    sendMsgToStorageServer();
-                }
-            }
-
-            if (heart_rates.size() == capacity) {
+            if (angles.size() == capacity) {
                 sendMsgToStorageServer();
             }
         }
@@ -66,7 +60,8 @@ public class UserDataModel {
 
     @Override
     public String toString(){
-        return String.format("{\"user_id\":\"%s\",\"heart_rate\":%s}", this.user_id, gson.toJson(this.heart_rates));
+        this.ended_at = GetTime();
+        return String.format("{\"user_id\":\"%s\",\"started_at\":\"%s\",\"ended_at\":\"%s\",\"postures\":%s}", this.user_id, this.started_at, this.ended_at, gson.toJson(this.angles));
     }
 
     private String GetTime(){
@@ -77,12 +72,12 @@ public class UserDataModel {
 
     private void sendMsgToStorageServer(){
         String json = this.toString();
-        this.heart_rates.clear();
+        this.angles.clear();
         Log.i("Request", "Send json to Storage server: "+ json);
         storageServerProxy.SendRequest(
                 new Request.Builder()
                         .post(RequestBody.create(MediaType.parse("application/json"), json))
-                        .url("https://smartyi-webapp.azurewebsites.net/api/heartrate/receive")
+                        .url("https://hackathon-student-posture.azurewebsites.net/api/v1/Posture")
                         .build(),
                 new Callback() {
                     @Override
@@ -125,24 +120,5 @@ public class UserDataModel {
                     }
                 }
         );
-    }
-
-    private boolean warningComputer(int heart_rate) {
-        if(heart_rate>WARNING_BAR) {
-            if(!sending) {
-                warning_count++;
-                if (warning_count >= 10) {
-                    warning_count = 0;
-                    sending = true;
-                    return true;
-                }
-                return false;
-            }
-            return false;
-        }else{
-            sending = false;
-            warning_count = 0;
-            return false;
-        }
     }
 }

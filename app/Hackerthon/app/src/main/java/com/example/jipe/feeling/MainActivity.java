@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     private ReceiveThread rThread=null;
 
     private int baseRandom = 60;
+
+    // Last buffer value
+    private int value = 0;
 
     // received data
     String receiveData="";
@@ -356,49 +360,54 @@ public class MainActivity extends AppCompatActivity {
 
             while(btSocket!=null )
             {
-                byte[] buff = new byte[40];
+                byte[] buff = new byte[10];
                 try {
                     inStream = btSocket.getInputStream();
+                    // DataInputStream dinput = new DataInputStream(inStream);
+                    // dinput.readFully(buff, 0, buff.length);
                     inStream.read(buff);
 
-                    processBuffer(buff,1);
+                    processBuffer(buff);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        private void processBuffer(byte[] buff,int size)
+        private void processBuffer(byte[] buff)
         {
-            boolean isValid = false;
-            int received = 0;
-            for(int i = 0; i < buff.length; ++i)
-            {
-                received = buff[0] & 0xff;
-                if (received == 13 || received == 10)
+            for (int i = 0; i < buff.length; ++i){
+                if (buff[i] == 0)
                 {
-                    continue;
+                    return;
                 }
-                isValid = true;
-                if (received > 48)
-                {
-                    received = received - 48;
+
+                if (buff[i] == 13 || buff[i] == 10) {
+                    if (value > 0)
+                    {
+                        receiveData = value + "\n" + receiveData;
+                        userData.add(value);
+                        value = 0;
+
+                        if(receiveData.length()>1000){
+                            receiveData = receiveData.substring(0, 100);
+                        }
+                        Message msg=Message.obtain();
+                        msg.what=1;
+                        handler.sendMessage(msg);
+                        continue;
+                    }
                 }
-                userData.add(received);
+                if (buff[i] > 48) {
+                    if (value > 0) {
+                        value = value * 10 + (buff[i] - 48);
+                    }
+                    else
+                    {
+                        value = buff[i] - 48;
+                    }
+                }
             }
-
-            if (!isValid)
-            {
-                return;
-            }
-
-            receiveData = received + "\n" + receiveData;
-            if(receiveData.length()>1000){
-                receiveData = receiveData.substring(0, 100);
-            }
-            Message msg=Message.obtain();
-            msg.what=1;
-            handler.sendMessage(msg);
         }
     }
 

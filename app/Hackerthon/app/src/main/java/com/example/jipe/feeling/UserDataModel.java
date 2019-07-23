@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -19,15 +20,10 @@ import okhttp3.Response;
 
 public class UserDataModel {
     private static final int DEFAULT_INIT_SIZE = 10;
-    private static final int WARNING_BAR = 30;
-    private static final String emailTemplate = "{\"Messages\":[{\"From\":{\"Email\":\"feelinghack@outlook.com\",\"Name\":\"FeelingTeam\"},\"To\":[{\"Email\":\"jipe@microsoft.com\",\"Name\":\"Test\"}],\"TemplateID\":492156,\"TemplateLanguage\":true,\"Subject\":\"Warning!AbnormalHeartRatse\",\"Variables\":{\"img_src\":\"https://steemitimages.com/0x0/http://ipfs.io/ipfs/QmTQo4cxDZ5MoszQAK93JyhFedeMuj7j4x5P7tQnvRi4A5\"}}]}";
 
     private int capacity = DEFAULT_INIT_SIZE;
     private RequestProxy storageServerProxy = new RequestProxy();
-    private RequestProxy emailServerProxy = new RequestProxy("eda3492958de0eefafe0a2d1365c5522", "95bda5a6a99a0a9ca3e6d1ffa30dde5c");
     private Gson gson = new Gson();
-    private int warning_count = 0;
-    private boolean sending = false;
 
     public String user_id;
     public String started_at;
@@ -75,11 +71,12 @@ public class UserDataModel {
         String json = this.toString();
         this.angles.clear();
         Log.i("Request", "Send json to Storage server: "+ json);
+        Request request = new Request.Builder()
+                .post(RequestBody.create(MediaType.parse("application/json"), json))
+                .url("https://hackathon-posture.azurewebsites.net/api/v1/Posture/SendDemoPostureInfoAsync")
+                .build();
         storageServerProxy.SendRequest(
-                new Request.Builder()
-                        .post(RequestBody.create(MediaType.parse("application/json"), json))
-                        .url("https://hackathon-student-posture.azurewebsites.net/api/v1/Posture/SendDemoPostureInfoAsync")
-                        .build(),
+                request,
                 new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
@@ -93,31 +90,6 @@ public class UserDataModel {
                         }
 
                         Log.i(" Server Request", "onResponse: " + response.body().string());
-                    }
-                }
-        );
-    }
-
-    private void sendMsgToEmailService(){
-        Log.i("Request", "Send warning to Email service: ");
-        emailServerProxy.SendRequest(
-                new Request.Builder()
-                        .post(RequestBody.create(MediaType.parse("application/json"), emailTemplate))
-                        .url("https://api.mailjet.com/v3.1/send")
-                        .build(),
-                new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (!response.isSuccessful()) {
-                            throw new IOException("Server Error: " + response);
-                        }
-
-                        Log.i(" Server Request", "Email send: onResponse: " + response.body().string());
                     }
                 }
         );
